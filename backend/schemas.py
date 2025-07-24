@@ -8,8 +8,8 @@ class UserIn(BaseModel):
 
 class UserOut(BaseModel):
     id: int
+    telegram_id: int
     name: str
-    keywords: str
 
     class Config():
         from_attributes = True
@@ -30,13 +30,16 @@ class KeywordsOut(BaseModel):
 class JobsIn(BaseModel):
     title: str
     description: str
+    source: str
     url: str
 
 
 class JobsOut(BaseModel):
     id: int
     title: str
+    source: str
     description: str
+    url: str
 
     class Config():
         from_attributes = True

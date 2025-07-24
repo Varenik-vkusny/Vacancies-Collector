@@ -5,9 +5,9 @@ from ..database import get_db
 from sqlalchemy import select
 
 
-route = APIRouter()
+router = APIRouter()
 
-@route.post('/users/register', response_model=schemas.UserOut, status_code=status.HTTP_201_CREATED)
+@router.post('/users/register', response_model=schemas.UserOut, status_code=status.HTTP_201_CREATED)
 async def user_register(user: schemas.UserIn, db: AsyncSession = Depends(get_db)):
 
     db_user_query = select(models.User).filter(models.User.telegram_id == user.telegram_id)
