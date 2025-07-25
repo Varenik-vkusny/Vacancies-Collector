@@ -46,3 +46,49 @@ async def get_keywords(user_id: int, db: AsyncSession = Depends(get_db)):
         )
     
     return db_keyword
+
+
+@router.put('keywords/{user_id}', response_model=schemas.KeywordsOut, status_code=status.HTTP_200_OK)
+async def put_keyword(user_id: int, new_keyword: schemas.KeywordsIn, db: AsyncSession = Depends(get_db)):
+
+    db_keyword_query = select(models.Keywords).filter(models.Keywords.user_id == user_id)
+
+    db_keyword_result = await db.execute(db_keyword_query)
+
+    db_keyword = db_keyword_result.scalar_one_or_none()
+
+    if not db_keyword:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='У вас нет заданных ключевых слов, задайте новые.'
+        )
+    
+    db_keyword = models.Keywords(**new_keyword.dict())
+
+    db.add(db_keyword)
+
+    await db.commit()
+
+    await db.refresh(db_keyword)
+
+    return db_keyword
+
+
+@router.delete('keywords/{user_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_keyword(user_id: int, db: AsyncSession = Depends(get_db)):
+
+    db_keyword_query = select(models.Keywords).filter(models.Keywords.user_id == user_id)
+
+    db_keyword_result = await db.execute(db_keyword_query)
+
+    db_keyword = db_keyword_result.scalar_one_or_none()
+
+    if not db_keyword:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='У вас нет заданных ключевых слов, чтобы удалить ключи сначала задайте новые.'
+        )
+    
+    await db.delete(db_keyword)
+
+    await db.commit()

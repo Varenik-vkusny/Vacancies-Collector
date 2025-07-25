@@ -29,9 +29,11 @@ class KeywordsOut(BaseModel):
 
 class JobsIn(BaseModel):
     title: str
-    description: str
+    description: str=None
     source: str
-    url: str
+    price: str
+    additionally: str
+
 
 
 class JobsOut(BaseModel):
