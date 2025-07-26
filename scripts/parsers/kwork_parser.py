@@ -1,5 +1,6 @@
 import requests
 import time
+import hashlib
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
@@ -75,15 +76,26 @@ def price():
 
         for project in projects:
 
-            url = project.get('link', '')
+            title = project['name']
+            
+            description = project['description']
+
+            price = project['priceLimit']
+
+            possible_price = project.get('possiblePriceLimit', 'Нет возможной цены.')
+
+            string = f'{title}{price}{possible_price}'
+
+            job_hash = hashlib.md5(string.encode('utf-8')).hexdigest()
 
             data.append(
                 {
-                    'title': project['name'].strip(),
-                    'description': project['description'].strip(),
+                    'job_hash': job_hash,
+                    'title': title,
+                    'description': description,
                     'source': 'Kwork',
-                    'price': project['priceLimit'],
-                    'possible_price': project['possiblePriceLimit']
+                    'price': price,
+                    'additionally': f'Возможная цена: {possible_price}'
                 }
             )
 

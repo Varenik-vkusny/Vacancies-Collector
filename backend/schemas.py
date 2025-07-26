@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
 class UserIn(BaseModel):
@@ -28,8 +29,9 @@ class KeywordsOut(BaseModel):
 
 
 class JobsIn(BaseModel):
+    job_hash: str
     title: str
-    description: str=None
+    description: Optional[str] = None
     source: str
     price: str
     additionally: str

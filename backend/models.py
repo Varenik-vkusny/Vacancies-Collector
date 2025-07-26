@@ -1,4 +1,4 @@
-from sqlalchemy import String, Integer, Column, ForeignKey
+from sqlalchemy import String, Integer, Boolean, Column, ForeignKey
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -8,6 +8,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     telegram_id = Column(Integer, index=True)
     name = Column(String, index=True)
+    is_active = Column(Boolean, index=True, default=True)
 
     keyword = relationship('Keywords', back_populates='user')
 
@@ -29,6 +30,10 @@ class Jobs(Base):
 
     description = Column(String, index=True)
 
+    price = Column(String, index=True)
+
     source = Column(String, index=True)
 
-    url = Column(String, index=True, unique=True)
+    additionally = Column(String, index=True)
+
+    job_hash = Column(String, index=True)
