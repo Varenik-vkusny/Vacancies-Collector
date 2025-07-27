@@ -18,7 +18,7 @@ class Keywords(Base):
     id = Column(Integer, primary_key=True, index=True)
     text = Column(String, nullable=False)
 
-    user_id = Column(Integer, ForeignKey('users.id'))
+    user_id = Column(Integer, ForeignKey('users.telegram_id'))
     user = relationship('User', back_populates='keyword')
 
 class Jobs(Base):

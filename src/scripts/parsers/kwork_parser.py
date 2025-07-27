@@ -4,7 +4,7 @@ import hashlib
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-def price():
+def parse():
     base_url = 'https://kwork.ru/projects?c=41'
     session_cookies = None
 
