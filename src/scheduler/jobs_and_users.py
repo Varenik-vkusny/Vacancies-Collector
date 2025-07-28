@@ -38,7 +38,7 @@ async def get_active_users_with_keywords(db: AsyncSession):
 
     logging.info('Беру всех активных пользователей.')
 
-    users_query = select(models.User).options(joinedload(models.User.keyword)).filter(models.User.is_active == True)
+    users_query = select(models.User).options(joinedload(models.User.keywords)).filter(models.User.is_active == True)
 
     users_result = await db.execute(users_query)
 
@@ -113,7 +113,7 @@ async def run_main_parsing():
             for job in new_jobs:
                 job_to_search = f'{job['title']} {job.get('description', '')}'.lower()
                 for user in active_users:
-                    for keyword in user.keyword:
+                    for keyword in user.keywords:
                         if keyword.text.lower() in job_to_search:
                             task = send_notification(user.telegram_id, job)
                             notification_tasks.append(task)

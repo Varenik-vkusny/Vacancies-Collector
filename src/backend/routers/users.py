@@ -20,13 +20,10 @@ async def user_register(user: schemas.UserIn, db: AsyncSession = Depends(get_db)
         db_user.name = user.name
 
         db_user.is_active = True
-        status_code = status.HTTP_200_OK
     else:
         db_user = models.User(**user.dict())
 
         db.add(db_user)
-
-        status_code = status.HTTP_201_CREATED
 
     await db.commit()
 

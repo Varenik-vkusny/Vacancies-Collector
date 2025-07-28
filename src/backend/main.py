@@ -57,7 +57,7 @@ async def startup():
     setup_sender(bot, loop)
 
 
-    scheduler.add_job(run_main_parsing, trigger='interval', minutes=1)
+    scheduler.add_job(run_main_parsing, trigger='interval', minutes=2)
     scheduler.start()
     logging.info('Планировщик запущен')
 

@@ -1,12 +1,10 @@
 import os
-import asyncio
 import httpx
-from aiogram import Bot, Dispatcher, Router, types, F
+from aiogram import Router, types, F
 from aiogram.filters import CommandStart
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from src.services.tg_send_message import setup_sender
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -32,12 +30,11 @@ if not BOT_TOKEN or not API_BASE_URL:
 main_kb = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text='Добавить ключевыe слова'),
+            KeyboardButton(text='Добавить ключевое слово'),
             KeyboardButton(text='Мои ключевые слова')
         ],
         [
-            KeyboardButton(text='Изменить ключевые слова'),
-            KeyboardButton(text='Удалить ключевые слова')
+            KeyboardButton(text='Удалить ключевое слово')
         ],
         [
             KeyboardButton(text='Зарегестрироваться на отправку уведомлений')
@@ -49,9 +46,9 @@ main_kb = ReplyKeyboardMarkup(
 class RegisterState(StatesGroup):
     waiting_for_username = State()
 
-class KeywordState(StatesGroup):
+class KeywordStates(StatesGroup):
     waiting_for_keyword = State()
-    waiting_for_new_keyword = State()
+    waiting_for_keyword_to_delete = State()
     
 
 
@@ -86,23 +83,24 @@ async def username_handler(message: types.Message, state: FSMContext):
             await state.clear()
         except httpx.RequestError:
             await message.answer('Ошибка при подключении к серверу')
+            await state.clear()
         except httpx.HTTPError:
             error_detail = response.json().get('detail', 'Неизвестная ошибка')
-            await message.answer(f'Ошибка: {error_detail}')
+            await message.answer(error_detail)
             await state.clear()
 
 
 
-@router.message(F.text == 'Добавить ключевыe слова')
+@router.message(F.text == 'Добавить ключевое слово')
 async def keyword_start(message: types.Message, state: FSMContext):
 
-    await message.answer('Напишите новые ключевые слова. Пишите одним сообщением: ')
+    await message.answer("Напишите новое ключевое слово. Пишите в одном сообщении одно ключевое слово. Например 'Python', 'Fast API', 'API' и так далее")
 
-    await state.set_state(KeywordState.waiting_for_keyword)
+    await state.set_state(KeywordStates.waiting_for_keyword)
 
 
 
-@router.message(KeywordState.waiting_for_keyword)
+@router.message(KeywordStates.waiting_for_keyword)
 async def keyword_handler(message: types.Message, state: FSMContext):
 
     json_data = {
@@ -116,14 +114,16 @@ async def keyword_handler(message: types.Message, state: FSMContext):
 
             response.raise_for_status()
 
-            await message.answer('Добавлены ключевые слова')
+            await message.answer('Добавлено ключевое слово')
 
             await state.clear()
         except httpx.RequestError:
             await message.answer('Ошибка при подключении к серверу')
+            await state.clear()
         except httpx.HTTPError:
             error_detail = response.json().get('detail', 'Неизвестная ошибка')
-            await message.answer(f'Ошибка: {error_detail}')
+            await message.answer(error_detail)
+            await state.clear()
 
 
 
@@ -132,71 +132,79 @@ async def get_keyword_handler(message: types.Message):
 
     await message.answer('Загружаю ваши ключевые слова...')
 
+    params = {
+        'telegram_id': message.from_user.id
+    }
+
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.get(f'{API_BASE_URL}/keywords/{message.from_user.id}')
+            response = await client.get(f'{API_BASE_URL}/keywords', params=params)
 
             response.raise_for_status()
 
-            keyword = response.json()
+            keywords = [keyword['text'] for keyword in response.json()]
 
-            await message.answer(f"Ваши ключевые слова: '{keyword['text']}'")
+            await message.answer(f"Ваши ключевые слова: '{', '.join(keywords)}'")
 
         except httpx.RequestError:
             await message.answer('Ошибка при подключении к серверу')
         except httpx.HTTPError:
             error_detail = response.json().get('detail', 'Неизвестная ошибка')
-            await message.answer(f'Ошибка: {error_detail}')
+            await message.answer(error_detail)
 
 
 
-@router.message(F.text == 'Изменить ключевые слова')
-async def new_keyword_start(message: types.Message, state: FSMContext):
+@router.message(F.text == 'Удалить ключевое слово')
+async def delete_keyword_start(message: types.Message, state: FSMContext):
 
-    await message.answer('Введите новые ключевые слова: ')
-
-    await state.set_state(KeywordState.waiting_for_new_keyword)
-
-
-
-@router.message(KeywordState.waiting_for_new_keyword)
-async def new_keyword_handler(message: types.Message, state: FSMContext):
-
-    json_data = {
-        'telegram_id': message.from_user.id,
-        'text': message.text
+    params = {
+        'telegram_id': message.from_user.id
     }
 
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.put(f'{API_BASE_URL}/keywords/{message.from_user.id}', json=json_data)
+            response = await client.get(f'{API_BASE_URL}/keywords', params=params)
 
             response.raise_for_status()
 
-            await message.answer('Ваши ключевые слова успешно изменены')
-            
-            await state.clear()
+            keywords = [keyword['text'] for keyword in response.json()]
+
+            await message.answer(f"Ваши ключевые слова: '{', '.join(keywords)}'")
+
+            await message.answer('Введите ключевое слово, которое вы хотите удалить: ')
+
+            await state.set_state(KeywordStates.waiting_for_keyword_to_delete)
+
         except httpx.RequestError:
-            await message.answer('Ошибка при кодключении к серверу')
+            await message.answer('Ошибка при подключении к серверу')
+            state.clear()
         except httpx.HTTPError:
             error_detail = response.json().get('detail', 'Неизвестная ошибка')
-            await message.answer(f'Ошибка: {error_detail}')
+            await message.answer(error_detail)
+            state.clear()
 
 
 
-@router.message(F.text == 'Удалить ключевые слова')
-async def delete_keyword_handler(message: types.Message):
+@router.message(KeywordStates.waiting_for_keyword_to_delete)
+async def delete_keyword_handler(message: types.Message, state: FSMContext):
+
+    params = {
+        'telegram_id': message.from_user.id,
+        'keyword_text': message.text
+    }
 
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.delete(f'{API_BASE_URL}/keywords/{message.from_user.id}')
+            response = await client.delete(f'{API_BASE_URL}/keywords', params=params)
 
             response.raise_for_status()
 
-            await message.answer('Ваши ключевые слова успешно удалены')
+            await message.answer('Ключевое слово успешно удалено')
         
         except httpx.RequestError:
-            await message.answer('Ошикбка при подключении к серверу')
+            await message.answer('Ошибка при подключении к серверу')
+            await state.clear()
         except httpx.HTTPError:
             error_detail = response.json().get('detail', 'Неизвестная ошибка')
-            await message.answer(f'Ошибка: {error_detail}')
+            await message.answer(error_detail)
+            await state.clear()

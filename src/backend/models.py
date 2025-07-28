@@ -10,7 +10,7 @@ class User(Base):
     name = Column(String, index=True)
     is_active = Column(Boolean, index=True, default=True)
 
-    keyword = relationship('Keywords', back_populates='user')
+    keywords = relationship('Keywords', back_populates='user')
 
 class Keywords(Base):
     __tablename__ = 'keywords'
@@ -19,7 +19,7 @@ class Keywords(Base):
     text = Column(String, nullable=False)
 
     user_id = Column(Integer, ForeignKey('users.id'))
-    user = relationship('User', back_populates='keyword')
+    user = relationship('User', back_populates='keywords')
 
 class Jobs(Base):
     __tablename__ = 'jobs'
