@@ -6,14 +6,28 @@ from aiogram.filters import CommandStart
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from ..services.tg_send_message import setup_sender
+from src.services.tg_send_message import setup_sender
 from dotenv import load_dotenv
+from pathlib import Path
 
-load_dotenv()
+current_file_path = Path(__file__).resolve()
+print(f"Путь к текущему файлу: {current_file_path}")
+
+project_root = current_file_path.parent.parent.parent
+
+env_path = project_root / ".env"
+
+if env_path.is_file():
+    load_dotenv(dotenv_path=env_path, verbose=True)
+else:
+    print(f"!!! ОШИБКА: .env файл НЕ НАЙДЕН по пути {env_path} !!!")
 
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 
 API_BASE_URL = os.getenv('API_BASE_URL')
+
+if not BOT_TOKEN or not API_BASE_URL:
+    print('Не нашел важные переменные')
 
 main_kb = ReplyKeyboardMarkup(
     keyboard=[
@@ -37,27 +51,29 @@ class RegisterState(StatesGroup):
 
 class KeywordState(StatesGroup):
     waiting_for_keyword = State()
-
-class NewKeywordState(StatesGroup):
-    waiting_for_keyword = State()
+    waiting_for_new_keyword = State()
+    
 
 
 router = Router()
 
 @router.message(CommandStart())
-async def command_start_handler(message: types.Message, state: FSMContext):
+async def command_start_handler(message: types.Message):
 
     await message.answer('Привет! Я бот, который отправляет уведомление, когда появляется новая вакансия на биржах', reply_markup=main_kb)
 
-    await message.answer('Введите пожалуйста свое имя: ')
+
+
+@router.message(F.text == 'Зарегестрироваться на отправку уведомлений')
+async def register_start(message: types.Message, state: FSMContext):
+
+    await message.answer('Давайте начнем регистрацию! Введите свое имя: ')
 
     await state.set_state(RegisterState.waiting_for_username)
 
-    
-
 
 @router.message(RegisterState.waiting_for_username)
-async def username_handler(message: types.Message):
+async def username_handler(message: types.Message, state: FSMContext):
 
     async with httpx.AsyncClient() as client:
         try:
@@ -66,15 +82,19 @@ async def username_handler(message: types.Message):
             response.raise_for_status()
 
             await message.answer(f'{message.text}, вы успешно зарегестрированы на отправку уведомлений!')
+
+            await state.clear()
         except httpx.RequestError:
             await message.answer('Ошибка при подключении к серверу')
-        except httpx.HTTPError as e:
-            await message.answer(f'Ошибка при запросе на сервер: {e}')
+        except httpx.HTTPError:
+            error_detail = response.json().get('detail', 'Неизвестная ошибка')
+            await message.answer(f'Ошибка: {error_detail}')
+            await state.clear()
 
 
 
 @router.message(F.text == 'Добавить ключевыe слова')
-async def nkeyword_start(message: types.Message, state: FSMContext):
+async def keyword_start(message: types.Message, state: FSMContext):
 
     await message.answer('Напишите новые ключевые слова. Пишите одним сообщением: ')
 
@@ -83,20 +103,27 @@ async def nkeyword_start(message: types.Message, state: FSMContext):
 
 
 @router.message(KeywordState.waiting_for_keyword)
-async def keywors_handler(message: types.Message, state: FSMContext):
+async def keyword_handler(message: types.Message, state: FSMContext):
+
+    json_data = {
+        'telegram_id': message.from_user.id,
+        'text': message.text
+    }
 
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.post(f'{API_BASE_URL}/keywords', json={'text': message.text})
+            response = await client.post(f'{API_BASE_URL}/keywords', json=json_data)
 
             response.raise_for_status()
 
             await message.answer('Добавлены ключевые слова')
 
+            await state.clear()
         except httpx.RequestError:
             await message.answer('Ошибка при подключении к серверу')
-        except httpx.HTTPError as e:
-            await message.answer(f'Ошибка при запросе на сервер: {e}')
+        except httpx.HTTPError:
+            error_detail = response.json().get('detail', 'Неизвестная ошибка')
+            await message.answer(f'Ошибка: {error_detail}')
 
 
 
@@ -117,8 +144,9 @@ async def get_keyword_handler(message: types.Message):
 
         except httpx.RequestError:
             await message.answer('Ошибка при подключении к серверу')
-        except httpx.HTTPError as e:
-            await message.answer(f'Ошибка: {e}')
+        except httpx.HTTPError:
+            error_detail = response.json().get('detail', 'Неизвестная ошибка')
+            await message.answer(f'Ошибка: {error_detail}')
 
 
 
@@ -127,29 +155,32 @@ async def new_keyword_start(message: types.Message, state: FSMContext):
 
     await message.answer('Введите новые ключевые слова: ')
 
-    await state.set_state(NewKeywordState.waiting_for_keyword)
+    await state.set_state(KeywordState.waiting_for_new_keyword)
 
 
 
-@router.message(NewKeywordState.waiting_for_keyword)
-async def new_keyword_handler(message: types.Message):
+@router.message(KeywordState.waiting_for_new_keyword)
+async def new_keyword_handler(message: types.Message, state: FSMContext):
 
-    new_keyword_json = {
+    json_data = {
+        'telegram_id': message.from_user.id,
         'text': message.text
     }
 
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.put(f'{API_BASE_URL}/keywords/{message.from_user.id}', json=new_keyword_json)
+            response = await client.put(f'{API_BASE_URL}/keywords/{message.from_user.id}', json=json_data)
 
             response.raise_for_status()
 
             await message.answer('Ваши ключевые слова успешно изменены')
-
+            
+            await state.clear()
         except httpx.RequestError:
             await message.answer('Ошибка при кодключении к серверу')
-        except httpx.HTTPError as e:
-            await message.answer(f'Ошибка: {e}')
+        except httpx.HTTPError:
+            error_detail = response.json().get('detail', 'Неизвестная ошибка')
+            await message.answer(f'Ошибка: {error_detail}')
 
 
 
@@ -166,22 +197,6 @@ async def delete_keyword_handler(message: types.Message):
         
         except httpx.RequestError:
             await message.answer('Ошикбка при подключении к серверу')
-        except httpx.HTTPError as e:
-            await message.answer(f'Ошибка: {e}')
-
-
-
-async def main():
-    bot = Bot(BOT_TOKEN)
-
-    dp = Dispatcher()
-
-    loop = asyncio.get_running_loop()
-
-    setup_sender(bot, loop)
-
-    await dp.start_polling(bot)
-
-
-if __name__ == '__main__':
-    asyncio.run(main())
+        except httpx.HTTPError:
+            error_detail = response.json().get('detail', 'Неизвестная ошибка')
+            await message.answer(f'Ошибка: {error_detail}')

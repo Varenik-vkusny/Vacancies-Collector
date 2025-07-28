@@ -17,6 +17,7 @@ class UserOut(BaseModel):
 
 
 class KeywordsIn(BaseModel):
+    telegram_id: int
     text: str
 
 

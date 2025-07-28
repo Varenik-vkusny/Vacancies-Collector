@@ -3,8 +3,15 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
+from pathlib import Path
 
-load_dotenv()
+current_file_path = Path(__file__)
+
+project_root = current_file_path.parent.parent.parent
+
+env_path = project_root / '.env'
+
+load_dotenv(dotenv_path=env_path)
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 

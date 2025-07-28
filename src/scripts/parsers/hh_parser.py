@@ -1,6 +1,5 @@
 import requests
 import hashlib
-from bs4 import BeautifulSoup
 
 
 def parse():
@@ -58,7 +57,7 @@ def parse():
                     'title': title,
                     'source': 'hh',
                     'price': price,
-                    'additionally': company
+                    'additionally': f'Компания: {company}'
                 }
             )
         
