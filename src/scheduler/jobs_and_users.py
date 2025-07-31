@@ -111,7 +111,7 @@ async def run_main_parsing():
             
             notification_tasks = []
             for job in new_jobs:
-                job_to_search = f'{job['title']} {job.get('description', '')}'.lower()
+                job_to_search = f"{job['title']} {job.get('description', '')}".lower()
                 for user in active_users:
                     for keyword in user.keywords:
                         if keyword.text.lower() in job_to_search:
@@ -124,17 +124,6 @@ async def run_main_parsing():
                 
 
                 notification_results = await asyncio.gather(*notification_tasks, return_exceptions=True)
-                
-                
-                successful_sends = 0
-                for i, result in enumerate(notification_results):
-                    if isinstance(result, Exception):
-                        # Если результат - это исключение, логируем его
-                        logging.error(f"Ошибка при отправке уведомления №{i+1}: {result}")
-                    else:
-                        successful_sends += 1
-                
-                logging.info(f'Обработка уведомлений завершена. Успешно отправлено: {successful_sends} из {len(notification_tasks)}.')
             logging.info('Парсинг и отправка уведомлений завершена!')
         except Exception as e:
             logging.info(f'Произошла критическая ошибка: {e}', exc_info=True)

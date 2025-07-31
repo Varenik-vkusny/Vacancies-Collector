@@ -27,8 +27,6 @@ if env_path.is_file():
 else:
     print(f"!!! ОШИБКА: .env файл НЕ НАЙДЕН по пути {env_path} !!!")
 
-BOT_TOKEN = os.getenv('BOT_TOKEN')
-
 
 async def db_init():
     async with async_engine.begin() as conn:
@@ -57,7 +55,7 @@ async def startup():
     setup_sender(bot, loop)
 
 
-    scheduler.add_job(run_main_parsing, trigger='interval', minutes=2)
+    scheduler.add_job(run_main_parsing, trigger='interval', minutes=30)
     scheduler.start()
     logging.info('Планировщик запущен')
 

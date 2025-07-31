@@ -24,11 +24,11 @@ async def send_notification(telegram_id: int, job: dict):
         return
     
     message_text = (
-        f'🔥 **Новая вакансия c {job['source']}!**\n\n'
-        f'**Название:** {job['title']}\n'
-        f'**Описание:** _{job.get('description', '')[:200]}..._\n'
-        f'**Цена:** {job['price']}\n'
-        f'**Дополнительно:** {job['additionally']}'
+        f"🔥 **Новая вакансия c {job['source']}!**\n\n"
+        f"**Название:** {job['title']}\n"
+        f"**Описание:** _{job.get('description', '')[:200]}..._\n"
+        f"**Цена:** {job['price']}\n"
+        f"**Дополнительно:** {job['additionally']}"
     )
 
     await bot_instance.send_message(
