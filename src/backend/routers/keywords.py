@@ -24,14 +24,7 @@ async def create_keywords(keyword: schemas.KeywordsIn, db: AsyncSession = Depend
         )
     
     for user_keyword in user.keywords:
-
-        db_keyword_exists = select(models.User).filter(user_keyword == keyword.text)
-
-        db_keyword_result = await db.execute(db_keyword_exists)
-
-        db_keyword = db_keyword_result.scalar_one_or_none()
-
-        if db_keyword:
+        if user_keyword.text == keyword.text:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail='У вас уже есть такое ключевое слово'

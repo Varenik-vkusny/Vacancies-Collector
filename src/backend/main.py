@@ -11,12 +11,12 @@ from src.scheduler.jobs_and_users import run_main_parsing
 from src.tg_bot.main_bot import router as bot_router
 from src.services.tg_send_message import setup_sender
 from dotenv import load_dotenv
+from contextlib import asynccontextmanager
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 current_file_path = Path(__file__).resolve()
-print(f"Путь к текущему файлу: {current_file_path}")
 
 project_root = current_file_path.parent.parent.parent
 
@@ -32,21 +32,17 @@ async def db_init():
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-app = FastAPI()
 
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 
-
-app.include_router(jobs.router)
-app.include_router(keywords.router)
-app.include_router(users.router)
 
 bot = Bot(BOT_TOKEN)
 dp = Dispatcher()
 scheduler = AsyncIOScheduler(timezone = 'Asia/Almaty')
 
-@app.on_event('startup')
-async def startup():
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
 
     logging.info('Приложение запускается')
 
@@ -67,8 +63,20 @@ async def startup():
 
     await db_init()
 
-@app.on_event('shutdown')
-async def on_shudown():
+    yield
+
     logging.info('Приложение останавливается')
     scheduler.shutdown()
     logging.info('Часовщик остановлен')
+
+
+app = FastAPI(lifespan=lifespan)
+
+# app.include_router(jobs.router)
+app.include_router(keywords.router)
+app.include_router(users.router)
+
+
+@app.get('/')
+def read_root():
+    return {"message": "Welcome to Vacancies Collector API"}

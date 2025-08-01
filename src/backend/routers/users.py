@@ -21,7 +21,7 @@ async def user_register(user: schemas.UserIn, db: AsyncSession = Depends(get_db)
 
         db_user.is_active = True
     else:
-        db_user = models.User(**user.dict())
+        db_user = models.User(**user.model_dump())
 
         db.add(db_user)
 

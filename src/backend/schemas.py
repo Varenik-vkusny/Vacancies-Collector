@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 
 
@@ -12,8 +12,7 @@ class UserOut(BaseModel):
     telegram_id: int
     name: str
 
-    class Config():
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class KeywordsIn(BaseModel):
@@ -25,8 +24,7 @@ class KeywordsOut(BaseModel):
     id: int
     text: str
 
-    class Config():
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class JobsIn(BaseModel):
@@ -46,5 +44,4 @@ class JobsOut(BaseModel):
     description: str
     url: str
 
-    class Config():
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
