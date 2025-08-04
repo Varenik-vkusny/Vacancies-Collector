@@ -1,4 +1,4 @@
-from sqlalchemy import String, Integer, Boolean, Column, ForeignKey
+from sqlalchemy import String, Integer, Boolean, Column, ForeignKey, BigInteger
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -6,7 +6,7 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, index=True)
-    telegram_id = Column(Integer, index=True)
+    telegram_id = Column(BigInteger, index=True)
     name = Column(String, index=True)
     is_active = Column(Boolean, index=True, default=True)
 

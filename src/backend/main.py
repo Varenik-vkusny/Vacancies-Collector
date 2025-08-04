@@ -5,10 +5,10 @@ from pathlib import Path
 from fastapi import FastAPI
 from aiogram import Bot, Dispatcher
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from .routers import jobs, keywords, users
+from .routers import    keywords, users
 from .database import async_engine, Base
 from src.scheduler.jobs_and_users import run_main_parsing
-from src.tg_bot.main_bot import router as bot_router
+from src.tg_bot.handlers import common_handlers, register_handler, keywords_handlers
 from src.services.tg_send_message import setup_sender
 from dotenv import load_dotenv
 from contextlib import asynccontextmanager
@@ -55,7 +55,7 @@ async def lifespan(app: FastAPI):
     scheduler.start()
     logging.info('Планировщик запущен')
 
-    dp.include_router(bot_router)
+    dp.include_routers(common_handlers.router, register_handler.router, keywords_handlers.router)
 
     asyncio.create_task(dp.start_polling(bot))
 
