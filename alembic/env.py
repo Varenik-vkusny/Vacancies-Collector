@@ -35,7 +35,13 @@ target_metadata = Base.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+database_url = settings.database_url
 
+if "IS_IN_DOCKER" not in os.environ:
+    print("Running in local mode. Replacing DB host for Alembic.")
+    database_url = database_url.replace("db:5432", "localhost:5432") 
+
+config.set_main_option('sqlalchemy.url', database_url)
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -76,12 +82,9 @@ async def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    ini_url = config.get_main_option("sqlalchemy.url")
-
-    async_url = ini_url.replace("postgresql+psycopg2", "postgresql+asyncpg")
 
     connectable = create_async_engine(
-        async_url
+        config.get_main_option('sqlalchemy.url')
     )
 
     async with connectable.connect() as connection:
