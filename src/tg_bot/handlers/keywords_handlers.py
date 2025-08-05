@@ -1,25 +1,10 @@
-import os
 import httpx
-from dotenv import load_dotenv
-from pathlib import Path
 from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
+from src.backend.config import settings
 
-
-current_file_path = Path(__file__).resolve()
-print(f"Путь к текущему файлу: {current_file_path}")
-
-project_root = current_file_path.parent.parent.parent
-
-env_path = project_root / ".env"
-
-if env_path.is_file():
-    load_dotenv(dotenv_path=env_path, verbose=True)
-else:
-    print(f"!!! ОШИБКА: .env файл НЕ НАЙДЕН по пути {env_path} !!!")
-
-API_BASE_URL = os.getenv('API_BASE_URL')
+API_BASE_URL = settings.api_base_url
 
 
 class KeywordStates(StatesGroup):

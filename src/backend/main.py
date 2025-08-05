@@ -1,39 +1,19 @@
 import os
 import logging
 import asyncio
-from pathlib import Path
 from fastapi import FastAPI
 from aiogram import Bot, Dispatcher
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from .routers import    keywords, users
+from .routers import keywords, users
 from .database import async_engine, Base
 from src.scheduler.jobs_and_users import run_main_parsing
 from src.tg_bot.handlers import common_handlers, register_handler, keywords_handlers
 from src.services.tg_send_message import setup_sender
-from dotenv import load_dotenv
 from contextlib import asynccontextmanager
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-
-current_file_path = Path(__file__).resolve()
-
-project_root = current_file_path.parent.parent.parent
-
-env_path = project_root / ".env"
-
-if env_path.is_file():
-    load_dotenv(dotenv_path=env_path, verbose=True)
-else:
-    print(f"!!! ОШИБКА: .env файл НЕ НАЙДЕН по пути {env_path} !!!")
+from .config import settings
 
 
-async def db_init():
-    async with async_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
-
-BOT_TOKEN = os.getenv('BOT_TOKEN')
+BOT_TOKEN = settings.bot_token
 
 
 bot = Bot(BOT_TOKEN)
@@ -60,8 +40,6 @@ async def lifespan(app: FastAPI):
     asyncio.create_task(dp.start_polling(bot))
 
     logging.info('Polling Запущен')
-
-    await db_init()
 
     yield
 
