@@ -4,15 +4,12 @@ import asyncio
 from logging.config import fileConfig
 
 from sqlalchemy import Connection
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
+from sqlalchemy.ext.asyncio import create_async_engine
 
 sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.backend.database import Base
 from src.backend.config import settings
-
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
 
 from alembic import context
 
