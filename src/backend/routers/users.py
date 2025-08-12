@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.backend import schemas, models
-from src.backend.database import get_db
+from ..dependencies import get_db
 from sqlalchemy import select
 
 
@@ -30,5 +30,3 @@ async def user_register(user: schemas.UserIn, db: AsyncSession = Depends(get_db)
     await db.refresh(db_user)
 
     return db_user
-
-

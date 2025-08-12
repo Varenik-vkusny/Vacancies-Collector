@@ -11,7 +11,3 @@ AsyncLocalSession = sessionmaker(bind=async_engine, class_=AsyncSession, expire_
 
 Base = declarative_base()
 from . import models
-
-async def get_db():
-    async with AsyncLocalSession() as session:
-        yield session

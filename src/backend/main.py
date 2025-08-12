@@ -1,11 +1,9 @@
-import os
 import logging
 import asyncio
 from fastapi import FastAPI
 from aiogram import Bot, Dispatcher
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from .routers import keywords, users
-from .database import async_engine, Base
 from src.scheduler.jobs_and_users import run_main_parsing
 from src.tg_bot.handlers import common_handlers, register_handler, keywords_handlers
 from src.services.tg_send_message import setup_sender
