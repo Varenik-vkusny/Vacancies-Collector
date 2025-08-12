@@ -1,10 +1,10 @@
 import logging
 import asyncio
+import aio_pika
 from fastapi import FastAPI
 from aiogram import Bot, Dispatcher
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from .routers import keywords, users
-from src.scheduler.jobs_and_users import run_main_parsing
 from src.tg_bot.handlers import common_handlers, register_handler, keywords_handlers
 from src.services.tg_send_message import setup_sender
 from contextlib import asynccontextmanager
@@ -19,6 +19,22 @@ dp = Dispatcher()
 scheduler = AsyncIOScheduler(timezone = 'Asia/Almaty')
 
 
+async def put_task_to_queue():
+    logging.info('Ложу задачу в очередь')
+
+    try:
+        connection = await aio_pika.connect_robust(settings.rabbitmq_url)
+        async with connection:
+            channel = await connection.channel()
+
+            await channel.default_exchange.publish(
+                aio_pika.message(body=b'start_parsing'),
+                routing_key='parsing_queue'
+            )
+        logging.info('Задача на парсинг отправлена')
+    except Exception as e:
+        logging.info(f'Не удалось отправить задачу на парсинг: {e}')
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
 
@@ -29,7 +45,7 @@ async def lifespan(app: FastAPI):
     setup_sender(bot, loop)
 
 
-    scheduler.add_job(run_main_parsing, trigger='interval', minutes=30)
+    scheduler.add_job(put_task_to_queue, trigger='interval', minutes=30)
     scheduler.start()
     logging.info('Планировщик запущен')
 
