@@ -1,10 +1,8 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
-from sqlalchemy import select
 from .. import schemas, models
 from ..dependencies import get_db
-from ..dependencies import get_user_by_tg_id, get_user_with_keywords_by_tg_id
+from ..dependencies import get_user_with_keywords_by_tg_id
 
 router = APIRouter()
 

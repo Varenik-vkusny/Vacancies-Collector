@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 from .database import AsyncLocalSession
-from . import models, schemas
+from . import models
 
 
 async def get_db():
