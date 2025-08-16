@@ -28,7 +28,7 @@ async def put_task_to_queue():
             channel = await connection.channel()
 
             await channel.default_exchange.publish(
-                aio_pika.message(body=b'start_parsing'),
+                aio_pika.Message(body=b'start_parsing'),
                 routing_key='parsing_queue'
             )
         logging.info('Задача на парсинг отправлена')
