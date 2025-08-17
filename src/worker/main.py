@@ -2,7 +2,9 @@ import aio_pika
 import logging
 import asyncio
 from src.scheduler.jobs_and_users import run_main_parsing
-from src.backend.config import settings
+from src.backend.config import get_settings
+
+settings = get_settings()
 
 logging.basicConfig(level=logging.INFO)
 

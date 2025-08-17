@@ -2,7 +2,9 @@ import httpx
 from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from src.backend.config import settings
+from src.backend.config import get_settings
+
+settings = get_settings()
 
 API_BASE_URL = settings.api_base_url
 

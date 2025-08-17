@@ -143,9 +143,9 @@ async def test_delete_keywords(client: AsyncClient, db_session: AsyncSession):
     # ПРЕДУСЛОВИЕ
 
     user = models.User(id=5, telegram_id=5, name='deletekwuser')
-    kw = models.Keywords(id=4, text='python', user_id=user.id)
+    kw = models.Keywords(id=4, text='python', user=user)
 
-    db_session.add_all([user, kw])
+    db_session.add(user)
     await db_session.commit()
 
 

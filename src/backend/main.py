@@ -8,7 +8,9 @@ from .routers import keywords, users
 from src.tg_bot.handlers import common_handlers, register_handler, keywords_handlers
 from src.services.tg_send_message import setup_sender
 from contextlib import asynccontextmanager
-from .config import settings
+from .config import get_settings
+
+settings = get_settings()
 
 
 BOT_TOKEN = settings.bot_token

@@ -6,6 +6,9 @@ from typing import AsyncGenerator
 from src.backend.main import app
 from src.backend.database import Base
 from src.backend.dependencies import get_db
+from src.backend.config import get_settings, get_test_settings
+
+app.dependency_overrides[get_settings] = get_test_settings
 
 TEST_DATABASE_URL = 'sqlite+aiosqlite:///:memory:'
 

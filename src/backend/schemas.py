@@ -1,5 +1,17 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from typing import Optional, List
+
+
+class KeywordsIn(BaseModel):
+    telegram_id: int
+    text: str
+
+
+class KeywordsOut(BaseModel):
+    id: int
+    text: str
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserIn(BaseModel):
@@ -15,33 +27,7 @@ class UserOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class KeywordsIn(BaseModel):
-    telegram_id: int
-    text: str
-
-
-class KeywordsOut(BaseModel):
-    id: int
-    text: str
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-class JobsIn(BaseModel):
-    job_hash: str
-    title: str
-    description: Optional[str] = None
-    source: str
-    price: str
-    additionally: str
-
-
-
-class JobsOut(BaseModel):
-    id: int
-    title: str
-    source: str
-    description: str
-    url: str
+class UserWithKeywords(UserOut):
+    keywords: List[KeywordsOut]
 
     model_config = ConfigDict(from_attributes=True)
