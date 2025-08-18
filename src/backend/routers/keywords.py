@@ -1,9 +1,10 @@
+import redis.asyncio as redis
+from typing import List
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-import redis.asyncio as redis
 from .. import schemas, models
 from ..dependencies import get_db
-from ..dependencies import get_user_with_keywords_by_tg_id, _get_user_with_kw_from_db_or_cache
+from ..dependencies import get_user_with_keywords_by_tg_id, get_user_with_kw_from_db_or_cache
 from ..clients import get_redis_client
 
 router = APIRouter()
@@ -12,7 +13,7 @@ router = APIRouter()
 @router.post('/keywords', response_model=schemas.KeywordsOut, status_code=status.HTTP_201_CREATED)
 async def create_keywords(keyword: schemas.KeywordsIn, redis_client: redis.Redis = Depends(get_redis_client), db: AsyncSession = Depends(get_db)):
 
-    user = await _get_user_with_kw_from_db_or_cache(telegram_id=keyword.telegram_id, db=db, redis_client=redis_client)
+    user = await get_user_with_keywords_by_tg_id(telegram_id=keyword.telegram_id, db=db)
 
     if not user:
         raise HTTPException(
@@ -37,8 +38,8 @@ async def create_keywords(keyword: schemas.KeywordsIn, redis_client: redis.Redis
     return db_keywords
 
 
-@router.get('/keywords', response_model=list[schemas.KeywordsOut], status_code=status.HTTP_200_OK)
-async def get_keywords(user: models.User = Depends(get_user_with_keywords_by_tg_id)):
+@router.get('/keywords', response_model=List[schemas.KeywordsOut], status_code=status.HTTP_200_OK)
+async def get_keywords(user: schemas.UserWithKeywords = Depends(get_user_with_kw_from_db_or_cache)):
 
     if not user.keywords:
         raise HTTPException(

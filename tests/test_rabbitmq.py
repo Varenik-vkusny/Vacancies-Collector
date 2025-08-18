@@ -1,6 +1,6 @@
 import pytest
 import aio_pika
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 from src.backend.main import put_task_to_queue
 
 
