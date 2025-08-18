@@ -17,6 +17,21 @@ services:
       rabbitmq:
         condition: service_healthy
 
+  bot:
+    build: .
+    command: ['python', '-m', 'src.tg_bot.main_bot']
+    
+    env_file:
+      - .env
+
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      web:
+        condition: service_started
+
   worker:
     build: .
     command: ['python', '-m', 'src.worker.main']

@@ -1,12 +1,9 @@
 import logging
-import asyncio
 import aio_pika
 from fastapi import FastAPI
 from aiogram import Bot, Dispatcher
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from .routers import keywords, users
-from src.tg_bot.handlers import common_handlers, register_handler, keywords_handlers
-from src.services.tg_send_message import setup_sender
 from contextlib import asynccontextmanager
 from .config import get_settings
 
@@ -37,25 +34,17 @@ async def put_task_to_queue():
     except Exception as e:
         logging.info(f'Не удалось отправить задачу на парсинг: {e}')
 
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
 
     logging.info('Приложение запускается')
 
-    loop = asyncio.get_running_loop()
-
-    setup_sender(bot, loop)
-
 
     scheduler.add_job(put_task_to_queue, trigger='interval', minutes=30)
     scheduler.start()
     logging.info('Планировщик запущен')
-
-    dp.include_routers(common_handlers.router, register_handler.router, keywords_handlers.router)
-
-    asyncio.create_task(dp.start_polling(bot))
-
-    logging.info('Polling Запущен')
 
     yield
 
