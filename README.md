@@ -1,78 +1,56 @@
-# ✒️ Vacancies Collector
+# ✒️ Vacancies Collector: Asynchronous Vacancy Monitoring Service
 
-An application with a FastAPI backend and a user-friendly Telegram bot client.
----
-
-## 🚀 About The Project
-
-This project is a tool for parsing job vacancies from two platforms (hh.ru and kwork.ru) and features a scheduling system to send notifications about the results. It consists of five key parts:
-
-*   **REST API on FastAPI:** A backend that handles processing, storage, and delivery of vacancy data, and provides the ability to save parsed jobs.
-*   **Telegram Bot on aiogram 3:** An interactive client that allows users to add, modify, view, and delete keywords for which they want to receive relevant job openings.
-*   **Scheduler:** A scheduler that, at set intervals, triggers notifications about new vacancies on the job platforms and determines which vacancies to send to which users.
-*   **Scripts (Scrapers):** Scrapers responsible for collecting data from the job platforms.
-*   **Services (Notification Sender):** A service that automatically sends a message to the user containing details about a new vacancy.
-
-This project demonstrates a comprehensive approach to backend development: from data collection and storage to API creation, process automation, and user interaction.
+This application is a microservice-based system for automatically collecting and delivering job vacancies to users via Telegram. The backend is implemented with FastAPI, an asynchronous worker processes parsing tasks, and a Telegram bot acts as the client interface.
 
 ---
 
-## 🛠️ Tech Stack
+## 🚀 Architecture and Technology
 
-*   **Backend:**
-    *   ![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python)
-    *   ![FastAPI](https://img.shields.io/badge/FastAPI-0.11x-009688?style=for-the-badge&logo=fastapi)
-    *   ![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0-DB4437?style=for-the-badge&logo=sqlalchemy)
-    *   ![Pydantic](https://img.shields.io/badge/Pydantic-v2-E96F00?style=for-the-badge)
-*   **Telegram Bot:**
-    *   ![aiogram](https://img.shields.io/badge/aiogram-3.x-26A5E4?style=for-the-badge)
-    *   ![httpx](https://img.shields.io/badge/httpx-async-000000?style=for-the-badge)
-*   **Database & Migrations:**
-    *   ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=for-the-badge&logo=postgresql)
-    *   ![Alembic](https://img.shields.io/badge/Alembic-migrations-4E2A84?style=for-the-badge)
-*   **Parsing & Scheduling:**
-    *   ![APScheduler](https://img.shields.io/badge/APScheduler-tasks-5C65F1?style=for-the-badge)
-    *   ![Selenium](https://img.shields.io/badge/Selenium-automation-43B02A?style=for-the-badge&logo=selenium)
-    *   ![BeautifulSoup4](https://img.shields.io/badge/BeautifulSoup4-parsing-C41424?style=for-the-badge)
-*   **Tooling, Containerization & Testing:**
-    *   ![Docker](https://img.shields.io/badge/Docker-compose-2496ED?style=for-the-badge&logo=docker)
-    *   ![Pytest](https://img.shields.io/badge/Pytest-testing-0A9EDC?style=for-the-badge&logo=pytest)
-    *   `Uvicorn` & `python-dotenv`
+This project demonstrates a full-cycle backend development process using modern asynchronous tools and DevOps practices.
+
+*   **FastAPI API:** An asynchronous REST API for managing users and their subscriptions (keywords).
+*   **Asynchronous Worker:** An isolated service that receives parsing tasks from a message broker and executes them in the background without blocking the API.
+*   **Aiogram 3 Telegram Bot:** The client interface for user interaction.
+*   **Scheduler (APScheduler):** Periodically enqueues parsing tasks.
+*   **Database (PostgreSQL):** Stores data about users and their search keywords.
+*   **Message Broker (RabbitMQ):** Ensures reliable asynchronous communication between the API and the worker.
+*   **Cache (Redis):** Used for caching database queries, significantly reducing load and speeding up API responses.
+
+### 🛠️ Tech Stack
+
+*   **Backend:** Python 3.12, **FastAPI**, **SQLAlchemy 2.0 (async)**, Pydantic V2, Alembic
+*   **Asynchrony:** **asyncio**, **RabbitMQ** (via aio-pika), **Redis**
+*   **Database:** **PostgreSQL**
+*   **Infrastructure & DevOps:** **Docker**, **Docker Compose**, CI/CD (GitHub Actions)
+*   **Testing:** **Pytest**, pytest-mock, httpx
 
 ---
 
 ## ✨ Key Features
 
-*   **Authorization:**
-    *   👤 Seamless registration and identification of users via their Telegram ID.
-*   **Automation & Parsing:**
-    *   ⚙️ **Automated Parsing:** Scripts for collecting data from multiple web resources.
-    *   ⏰ **Scheduled Tasks:** Regular execution of parsing and notification tasks using `APScheduler`.
-    *   🔔 **Personalized Notifications:** Users receive only the vacancies that match their specified keywords in Telegram.
-*   **Data Management:**
-    *   ✍️ Full CRUD operations for keywords.
-    *   🤖 Saving and associating keywords with specific users.
-*   **Telegram Bot as a Client:**
-    *   🔑 Easy registration for receiving notifications.
-    *   💬 Convenient navigation using a persistent Reply Keyboard.
-    *   🧠 Use of a Finite State Machine (FSM) to implement step-by-step dialogues.
-*   **Code Quality & Infrastructure:**
-    *   📄 **API Documentation:** Automatically generated interactive documentation (Swagger UI, ReDoc).
-    *   🐋 **Full Containerization:** The application and PostgreSQL database are fully configured to run with a single command via Docker Compose.
-    *   🧪 **Testing:** Key API logic is covered by integration tests using Pytest.
-    *   🔄 **DB Migrations:** Database schema versioning is managed with Alembic.
+*   **Asynchronous Architecture:** All components (API, worker, DB, and cache interactions) are fully asynchronous, ensuring high performance.
+*   **Performance Optimization:**
+    *   **`selectinload` over `joinedload`:** For efficient loading of one-to-many related data.
+    *   **API-level Caching:** Reduces database load and accelerates `GET` requests using Redis.
+    *   **Resource Management via `lifespan`:** Ensures proper startup and shutdown of connection pools.
+*   **Reliability & Code Quality:**
+    *   **Comprehensive Test Coverage:** E2E tests for the API and Unit tests for business logic, including mocking of external services.
+    *   **Isolated Environment:** Fully containerized with Docker Compose for consistent development and deployment.
+    *   **DB Migrations:** Safe database schema management using Alembic.
+*   **User Features:**
+    *   Seamless user registration via Telegram.
+    *   CRUD operations for managing keywords.
+    *   Personalized notifications for new vacancies.
 
 ---
 
-## 🏁 Getting Started (via Docker)
-
-This is the recommended and easiest way to run the project.
+## 🏁 Getting Started
 
 ### Prerequisites
-*   [Docker](https://www.docker.com/products/docker-desktop/)
-*   A Telegram Bot Token from [@BotFather](https://t.me/BotFather)
+*   Docker
+*   Docker Compose
 
-### Installation and Launch
+### Installation & Launch
 
 1.  **Clone the repository:**
     ```bash
@@ -80,30 +58,47 @@ This is the recommended and easiest way to run the project.
     cd Vacancies-Collector
     ```
 
-2.  **Create the `.env` file:**
-    *   Create a `.env` file in the root directory based on the `.env.example` template.
-    *   Paste your bot token from @BotFather into the `BOT_TOKEN` variable.
+2.  **Configure environment variables:**
+    *   Copy `.env.example` to `.env` and `.env.db.example` to `.env.db`.
+    *   Fill in the required values in `.env` (especially `BOT_TOKEN`).
 
-3.  **Build and run the application:**
-    *   Build and start the application with the following command:
+3.  **Run the application:**
     ```bash
-    docker-compose up --build -d
+    docker-compose up --build
     ```
 
-4.  **Apply the migrations:**
-    *   Apply the Alembic migrations with the following command:
+4.  **Apply migrations (in a separate terminal):**
+    *   Wait for the containers to start up, then execute:
     ```bash
     docker-compose exec web alembic upgrade head
     ```
-5.  **Done! Your application is up and running!**
-
-*   The API is available at `http://localhost:8000`.
-*   The documentation is available at `http://localhost:8000/docs`.
-*   Your bot is now running!
+5.  **Done!**
+    *   The API is available at `http://localhost:8000`
+    *   Interactive API documentation: `http://localhost:8000/docs`
+    *   Your Telegram bot is now running and ready to use.
 
 ---
-### Stopping the Application
-   *   You can stop the application with the command:
+
+### Running Tests
+
+A running Redis container is required to run the E2E tests.
+
+1.  **Start Redis in detached mode:**
+    ```bash
+    docker-compose up -d redis
+    ```
+2.  **Install dependencies and run tests:**
+    ```bash
+    # (Activate your virtual environment)
+    pip install -r requirements.txt
+    pytest
+    ```
+3.  **Stop Redis after testing:**
     ```bash
     docker-compose down
     ```
+
+---
+### Stopping the Application
+```bash
+docker-compose down
