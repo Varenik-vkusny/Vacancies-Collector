@@ -1,4 +1,3 @@
-import json
 from fastapi import Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,7 +6,7 @@ from sqlalchemy.orm import joinedload, selectinload
 import redis.asyncio as redis
 from .database import AsyncLocalSession
 from . import models, schemas
-from .client import get_redis_client
+from .clients import get_redis_client
 
 
 async def get_db():
@@ -45,17 +44,13 @@ async def _get_user_with_kw_from_db_or_cache(
     if cached_user:
         print("CACHE HIT")
         pydantic_user = schemas.UserWithKeywords.model_validate_json(cached_user)
-        query = (
-        select(models.User)
-        .options(selectinload(models.User.keywords))
-        .filter(models.User.id == pydantic_user.id)
-        )
+        query = (select(models.User).options(selectinload(models.User.keywords)).filter(models.User.id == pydantic_user.id))
         result = await db.execute(query)
         user_from_db = result.scalar_one_or_none()
         return user_from_db
 
     print("CACHE MISS")
-    user_query = select(models.User).options(joinedload(models.User.keywords)).filter(models.User.telegram_id == telegram_id)
+    user_query = select(models.User).options(selectinload(models.User.keywords)).filter(models.User.telegram_id == telegram_id)
     user_from_db = (await db.execute(user_query)).unique().scalar_one_or_none()
 
     if not user_from_db:

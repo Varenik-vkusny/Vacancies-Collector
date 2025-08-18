@@ -7,8 +7,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     telegram_id = Column(BigInteger, index=True)
-    name = Column(String, index=True)
-    is_active = Column(Boolean, index=True, default=True)
+    name = Column(String)
 
     keywords = relationship('Keywords', back_populates='user')
 
@@ -26,14 +25,14 @@ class Jobs(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    title = Column(String, index=True)
+    title = Column(String)
 
-    description = Column(String, index=True)
+    description = Column(String)
 
-    price = Column(String, index=True)
+    price = Column(String)
 
-    source = Column(String, index=True)
+    source = Column(String)
 
-    additionally = Column(String, index=True)
+    additionally = Column(String)
 
     job_hash = Column(String, index=True)

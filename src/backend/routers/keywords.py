@@ -4,7 +4,7 @@ import redis.asyncio as redis
 from .. import schemas, models
 from ..dependencies import get_db
 from ..dependencies import get_user_with_keywords_by_tg_id, _get_user_with_kw_from_db_or_cache
-from ..client import get_redis_client
+from ..clients import get_redis_client
 
 router = APIRouter()
 

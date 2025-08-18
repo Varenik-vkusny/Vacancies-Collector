@@ -20,6 +20,5 @@ def get_test_settings():
         database_url="sqlite+aiosqlite:///:memory:",
         redis_url="redis://localhost:6380/1",
         bot_token="fake_bot_token",
-        api_base_url="http://test",
-        base_url="http://test"
+        api_base_url="http://test"
     )

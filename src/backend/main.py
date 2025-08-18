@@ -1,11 +1,13 @@
 import logging
 import aio_pika
+import redis.asyncio as redis
 from fastapi import FastAPI
 from aiogram import Bot, Dispatcher
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from .routers import keywords, users
 from contextlib import asynccontextmanager
 from .config import get_settings
+from . import clients
 
 settings = get_settings()
 
@@ -41,6 +43,8 @@ async def lifespan(app: FastAPI):
 
     logging.info('Приложение запускается')
 
+    clients.redis_client = redis.from_url(settings.redis_url, encoding='utf-8', decode_responses=True)
+    logging.info('Redis подключен')
 
     scheduler.add_job(put_task_to_queue, trigger='interval', minutes=30)
     scheduler.start()
@@ -51,6 +55,10 @@ async def lifespan(app: FastAPI):
     logging.info('Приложение останавливается')
     scheduler.shutdown()
     logging.info('Часовщик остановлен')
+
+    if clients.redis_client:
+        await clients.redis_client.close()
+        logging.info('Redis остановлен')
 
 
 app = FastAPI(lifespan=lifespan)
