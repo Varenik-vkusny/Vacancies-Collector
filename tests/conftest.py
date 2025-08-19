@@ -34,13 +34,17 @@ async def override_redis_client():
     test_settings = get_test_settings()
     return redis.from_url(test_settings.redis_url, encoding='utf-8', decode_responses=True)
 
-
 app.dependency_overrides[get_redis_client] = override_redis_client
 
 @pytest.fixture(autouse=True, scope='function')
 async def prepare_database():
     async with test_async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+    test_settings = get_test_settings()    
+    redis_client = redis.from_url(test_settings.redis_url)
+    await redis_client.flushdb()
+    await redis_client.aclose()
     yield
     async with test_async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
