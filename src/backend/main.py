@@ -15,8 +15,8 @@ settings = get_settings()
 BOT_TOKEN = settings.bot_token
 
 
-bot = Bot(BOT_TOKEN)
-dp = Dispatcher()
+bot: Bot | None=None
+dp: Dispatcher | None=None
 scheduler = AsyncIOScheduler(timezone = 'Asia/Almaty')
 
 
@@ -42,6 +42,9 @@ async def put_task_to_queue():
 async def lifespan(app: FastAPI):
 
     logging.info('Приложение запускается')
+
+    bot = Bot(BOT_TOKEN)
+    dp = Dispatcher()
 
     clients.redis_client = redis.from_url(settings.redis_url, encoding='utf-8', decode_responses=True)
     logging.info('Redis подключен')
