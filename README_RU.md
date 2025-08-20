@@ -1,5 +1,7 @@
 # ✒️ Vacancies Collector: Асинхронный сервис для мониторинга вакансий
 
+[![Run Python Tests](https://github.com/Varenik-vkusny/Vacancies-Collector/actions/workflows/ci.yml/badge.svg)](https://github.com/Varenik-vkusny/Vacancies-Collector/actions/workflows/ci.yml)
+
 Приложение представляет собой микросервисную систему для автоматического сбора и доставки вакансий пользователям в Telegram. Бэкенд реализован на FastAPI, асинхронный воркер обрабатывает задачи парсинга, а Telegram-бот выступает в роли клиентского интерфейса.
 
 ---
