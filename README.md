@@ -1,5 +1,7 @@
 # ✒️ Vacancies Collector: Asynchronous Vacancy Monitoring Service
 
+[![Run Python Tests](https://github.com/Varenik-vkusny/Vacancies-Collector/actions/workflows/ci.yml/badge.svg)](https://github.com/Varenik-vkusny/Vacancies-Collector/actions/workflows/ci.yml)
+
 This application is a microservice-based system for automatically collecting and delivering job vacancies to users via Telegram. The backend is implemented with FastAPI, an asynchronous worker processes parsing tasks, and a Telegram bot acts as the client interface.
 
 ---
