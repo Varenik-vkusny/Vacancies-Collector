@@ -22,6 +22,11 @@ jobs:
                 
                 ports:
                     - 6380:6379
+
+            rabbitmq:
+                image: rabbitmq:3-management
+                ports:
+                - 5672:5672
         
         steps:
             - name: Checkout repository
@@ -41,9 +46,7 @@ jobs:
               run: |
                 echo "DATABASE_URL=sqlite+aiosqlite:///:memory:" >> .env
                 echo "REDIS_URL=redis://localhost:6379/1" >> .env
-                echo "ALGORITHM=HS256" >> .env
-                echo "SECRET_KEY=test_secret" >> .env
-                echo "ACCESS_TOKEN_EXPIRE_MINUTES=30" >> .env
+                echo "RABBITMQ_URL=amqp://guest:guest@localhost:5672/" >> .env
                 echo "BOT_TOKEN=fake_token" >> .env
                 echo "API_BASE_URL=http://test" >> .env
                 echo "BASE_URL=http://test/" >> .env
