@@ -1,3 +1,6 @@
+[Read in English](README.md)
+---
+
 # ✒️ Vacancies Collector: Asynchronous Service for Vacancy Monitoring
 
 [![Run Python Tests](https://github.com/Varenik-vkusny/Vacancies-Collector/actions/workflows/ci.yml/badge.svg)](https://github.com/Varenik-vkusny/Vacancies-Collector/actions/workflows/ci.yml)
