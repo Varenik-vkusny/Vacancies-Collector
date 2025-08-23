@@ -1,4 +1,5 @@
 [Read in English](README.md)
+---
 
 # ✒️ Vacancies Collector: Асинхронный сервис для мониторинга вакансий
 
