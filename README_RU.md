@@ -1,3 +1,5 @@
+[Read in English](README.md)
+
 # ✒️ Vacancies Collector: Асинхронный сервис для мониторинга вакансий
 
 [![Run Python Tests](https://github.com/Varenik-vkusny/Vacancies-Collector/actions/workflows/ci.yml/badge.svg)](https://github.com/Varenik-vkusny/Vacancies-Collector/actions/workflows/ci.yml)
@@ -21,7 +23,7 @@
 ### 🛠️ Стек
 
 *   **Бэкенд:** Python 3.12, **FastAPI**, **SQLAlchemy 2.0 (async)**, Pydantic V2, Alembic
-*   **Асинхронность:** **asyncio**, **RabbitMQ** (через aio-pika), **Redis** 
+*   **Асинхронность:** **asyncio**, **RabbitMQ** (через aio-pika), **Redis**
 *   **База данных:** **PostgreSQL**
 *   **Инфраструктура и DevOps:** **Docker**, **Docker Compose**, CI/CD (GitHub Actions)
 *   **Тестирование:** **Pytest**, pytest-mock, httpx
@@ -61,7 +63,7 @@
     ```
 
 2.  **Настройте переменные окружения:**
-    *   Скопируйте `.env.example` в `.env` и `.env.db.example` в `.env.db`.
+    *   Скопируйте `.env.example` в `.env`, `.env.db.example` в `.env.db` и т.д.
     *   Заполните необходимые значения в `.env` (в первую очередь `BOT_TOKEN`).
 
 3.  **Запустите приложение:**
@@ -83,19 +85,16 @@
 
 ### Запуск тестов
 
-Для запуска E2E-тестов необходим запущенный Docker-контейнер с Redis.
-
-1.  **Запустите Redis в фоновом режиме:**
+1.  **Запустите redis в фоновом режиме:**
     ```bash
-    docker-compose up -d redis
+    docker-compose up -d redis 
     ```
 2.  **Установите зависимости и запустите тесты:**
     ```bash
-    # (Активируйте ваше виртуальное окружение)
     pip install -r requirements.txt
     pytest
     ```
-3.  **Остановите Redis после тестов:**
+3.  **Остановите сервисы после тестов:**
     ```bash
     docker-compose down
     ```
