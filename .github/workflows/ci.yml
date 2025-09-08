@@ -44,12 +44,14 @@ jobs:
 
             - name: Create .env file for tests
               run: |
-                echo "DATABASE_URL=sqlite+aiosqlite:///:memory:" >> .env
-                echo "REDIS_URL=redis://localhost:6379/1" >> .env
-                echo "RABBITMQ_URL=amqp://guest:guest@localhost:5672/" >> .env
-                echo "BOT_TOKEN=fake_token" >> .env
+                echo "TEST_MODE=true" >> .env # Флаг, что мы в тестах
+          
+                echo "REDIS_HOST=localhost" >> .env
+                echo "REDIS_PORT=6380" >> .env
+                echo "REDIS_DB=1" >> .env
+
+                echo "BOT_TOKEN=fake_bot_token_for_ci" >> .env
                 echo "API_BASE_URL=http://test" >> .env
-                echo "BASE_URL=http://test/" >> .env
 
             - name: Run tests
               run: pytest
