@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: vacancies-collector
+data:
+  DB_HOST: "postgres-service"
+  DB_DRIVER: "postgresql+asyncpg"
+  DB_PORT: "5432"
+  DB_NAME: "vcdb"
+
+  API_BASE_URL: "http://web:8000"
+  IS_IN_DOCKER: "1"
+
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "5672"
+  REDIS_DB: "0"
+
+  RABBITMQ_HOST: "rabbitmq-service"
+  RABBITMQ_PORT: "5672"

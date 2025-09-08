@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: vacancies-collector
+spec:
+  selector:
+    matchLabels:
+      app: redis
+
+  serviceName: redis-service
+
+  replicas: 1
+
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis-container
+          image: redis:8-alpine
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - name: redis-mount
+              mountPath: /data
+
+          envFrom:
+            - configMapRef:
+                name: app-config
+
+  volumeClaimTemplates:
+    - metadata:
+        name: redis-mount
+        namespace: vacancies-collector
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: vacancies-collector
+spec:
+  selector:
+    app: redis
+  ports:
+    - port: 6379
+      targetPort: 6379
