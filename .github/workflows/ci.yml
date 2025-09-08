@@ -46,10 +46,21 @@ jobs:
               run: |
                 echo "TEST_MODE=true" >> .env # Флаг, что мы в тестах
           
+                echo "DB_DRIVER=sqlite+aiosqlite" >> .env
+                echo "DB_NAME=:memory:" >> .env
+                
                 echo "REDIS_HOST=localhost" >> .env
                 echo "REDIS_PORT=6380" >> .env
                 echo "REDIS_DB=1" >> .env
 
+                echo "RABBITMQ_HOST=localhost" >> .env
+                echo "RABBITMQ_PORT=5672" >> .env
+                echo "RABBITMQ_USER=guest" >> .env
+                echo "RABBITMQ_PASSWORD=guest" >> .env
+
+                echo "SECRET_KEY=test_secret_for_ci" >> .env
+                echo "ALGORITHM=HS256" >> .env
+                echo "ACCESS_TOKEN_EXPIRE_MINUTES=30" >> .env
                 echo "BOT_TOKEN=fake_bot_token_for_ci" >> .env
                 echo "API_BASE_URL=http://test" >> .env
 
