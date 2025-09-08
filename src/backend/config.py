@@ -5,11 +5,11 @@ from functools import lru_cache
 
 class Settings(BaseSettings):
 
-    db_host: str
-    db_port: int
-    db_driver: str
-    db_user: str
-    db_password: str
+    db_host: str = "postgresql+asyncpg"
+    db_port: int | None = None
+    db_driver: str | None = None
+    db_user: str | None = None
+    db_password: str | None = None
     db_name: str
 
     api_base_url: str
@@ -27,6 +27,10 @@ class Settings(BaseSettings):
     @computed_field
     @property
     def database_url(self) -> str:
+
+        if self.db_driver.startswith("sqlite"):
+            return f"{self.db_driver}:///{self.db_name}"
+
         return f"{self.db_driver}://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
 
     @computed_field
