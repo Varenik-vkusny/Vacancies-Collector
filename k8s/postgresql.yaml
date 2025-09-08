@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: vacancies-collector
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  serviceName: postgres-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres-container
+          image: postgres:17
+
+          startupProbe:
+            exec:
+              command:
+                - "sh"
+                - "-c"
+
+                - "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"
+
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 5
+
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-mount
+              mountPath: /var/lib/postgresql/data
+
+          envFrom:
+            - configMapRef:
+                name: app-config
+
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: DB_USER
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: DB_PASSWORD
+
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_NAME
+
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-mount
+        namespace: vacancies-collector
+      spec:
+        accessModes: ["ReadWriteOnce"]
+
+        resources:
+          requests:
+            storage: 1Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: vacancies-collector
+spec:
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432

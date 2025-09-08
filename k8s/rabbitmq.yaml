@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rabbitmq
+  namespace: vacancies-collector
+spec:
+  selector:
+    matchLabels:
+      app: rabbitmq
+
+  serviceName: rabbitmq-service
+
+  replicas: 1
+
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+
+    spec:
+      containers:
+        - name: rabbitmq-container
+          image: rabbitmq:3.13-management
+          ports:
+            - containerPort: 15672
+              name: http
+            - containerPort: 5672
+              name: amqp
+
+          envFrom:
+            - configMapRef:
+                name: app-config
+
+          env:
+            - name: RABBITMQ_USER
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: RABBITMQ_USER
+
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: RABBITMQ_PASSWORD
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-service
+  namespace: vacancies-collector
+spec:
+  selector:
+    app: rabbitmq
+  ports:
+    - name: amqp
+      port: 5672
+      targetPort: 5672
+    - name: http
+      port: 15672
+      targetPort: 15672
