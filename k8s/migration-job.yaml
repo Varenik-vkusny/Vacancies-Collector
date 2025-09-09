@@ -1,0 +1,53 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migration-job
+  namespace: vacancies-collector
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+
+      initContainers:
+        - name: check-db
+
+          image: postgres:17
+
+          command: [
+              "sh",
+              "-c",
+              'until pg_isready -h postgres-service -p 5432;
+              do echo "Waiting for PostgreSQL to be ready...";
+              sleep 2;
+              done && echo "PostgreSQL is ready, waiting 5 seconds for stabilization..." && sleep 5',
+            ]
+
+      containers:
+        - name: alembic-container
+          image: varenikvkusny/vacancies_collector:1.0
+          command: ["alembic", "upgrade", "head"]
+
+          envFrom:
+            - configMapRef:
+                name: app-config
+
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: DB_USER
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: DB_PASSWORD
+
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_NAME
+
+  backoffLimit: 4
