@@ -2,10 +2,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: bot-deployment
+  namespace: vacancies-collector
 spec:
   selector:
     matchLabels:
       app: bot
+  replicas: 1
 
   template:
     metadata:
@@ -16,7 +18,7 @@ spec:
       containers:
         - name: bot-container
 
-          image: varenikvkusny/vacancies_collector:1.0
+          image: varenikvkusny/vacancies-collector:1.1
 
           command: ["python", "-m", "src.tg_bot.main_bot"]
 
