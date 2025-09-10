@@ -9,6 +9,7 @@ spec:
   selector:
     matchLabels:
       app: app
+
   template:
     metadata:
       labels:
@@ -16,7 +17,7 @@ spec:
     spec:
       containers:
         - name: app-container
-          image: varenikvkusny/vacancies_collector:1.0
+          image: varenikvkusny/vacancies-collector:1.1
           resources:
             requests:
               memory: "64Mi"
@@ -57,7 +58,7 @@ metadata:
   namespace: vacancies-collector
 spec:
   selector:
-    app: mapp
+    app: app
   ports:
     - port: 8000
       targetPort: 8000

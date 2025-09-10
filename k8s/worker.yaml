@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: worker-container
-          image: varenikvkusny/vacancies_collector:1.0
+          image: varenikvkusny/vacancies-collector:1.1
           resources:
             requests:
               memory: "64Mi"

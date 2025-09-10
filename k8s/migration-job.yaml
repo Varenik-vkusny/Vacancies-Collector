@@ -24,7 +24,7 @@ spec:
 
       containers:
         - name: alembic-container
-          image: varenikvkusny/vacancies_collector:1.0
+          image: varenikvkusny/vacancies-collector:1.1
           command: ["alembic", "upgrade", "head"]
 
           envFrom:
