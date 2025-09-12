@@ -1,4 +1,4 @@
-[Read in English](README.md)
+[Читать на русском](README_RU.md)
 ---
 
 # ✒️ Vacancies Collector: Asynchronous Service for Vacancy Monitoring
