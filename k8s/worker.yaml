@@ -18,7 +18,8 @@ spec:
     spec:
       containers:
         - name: worker-container
-          image: varenikvkusny/vacancies-collector:1.1
+          image: varenikvkusny/vacancies-collector:1.3
+          command: ["python", "-m", "src.worker.main"]
           resources:
             requests:
               memory: "64Mi"

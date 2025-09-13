@@ -32,13 +32,13 @@ spec:
                 name: app-config
 
           env:
-            - name: RABBITMQ_USER
+            - name: RABBITMQ_DEFAULT_USER
               valueFrom:
                 secretKeyRef:
                   name: app-secret
                   key: RABBITMQ_USER
 
-            - name: RABBITMQ_PASSWORD
+            - name: RABBITMQ_DEFAULT_PASS
               valueFrom:
                 secretKeyRef:
                   name: app-secret
